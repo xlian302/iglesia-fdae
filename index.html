@@ -163,7 +163,7 @@ let BIBLIA = {};
 
 async function cargarBiblia(){
     try{
-        const res = await fetch("rv1960.json");
+        const res = await fetch("./rv1960.json");
         if(!res.ok) throw new Error();
         BIBLIA = await res.json();
     }catch{
