@@ -14,6 +14,20 @@ body{
     text-align:center;
 }
 
+/* header */
+.header{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:15px;
+    margin-top:20px;
+}
+
+.logo{
+    width:60px;
+    height:60px;
+}
+
 /* pantallas */
 .pantalla{ display:none; padding:40px; }
 .activo{ display:block; }
@@ -44,33 +58,22 @@ body{
 .b-verde{background:#2ecc71;}
 .b-naranja{background:#e67e22;}
 
-/* inputs */
-input{
+input, button{
     padding:12px;
     border-radius:10px;
     border:none;
     margin:10px;
     font-size:18px;
-    width:200px;
 }
 
-button{
-    padding:12px 20px;
-    border:none;
-    border-radius:10px;
-    cursor:pointer;
-}
-
-/* visor biblia */
-#visor-b{
-    margin-top:30px;
+#visor-b, #visor-h{
+    margin-top:20px;
     max-width:900px;
     margin:auto;
-    font-size:22px;
 }
 
 .versiculo{
-    margin:15px;
+    margin:10px;
     padding:15px;
     background:#111;
     border-left:5px solid #3498db;
@@ -78,37 +81,17 @@ button{
     text-align:left;
 }
 
-.num{
-    color:#3498db;
-    font-weight:bold;
-    margin-right:10px;
-}
-
-/* himnario */
-#visor-h{
-    margin-top:20px;
-    max-width:800px;
-    margin:auto;
-    font-size:22px;
-}
-
-/* predica */
-textarea{
-    width:80%;
-    height:150px;
-    border-radius:10px;
-    padding:10px;
-}
-
-#visor-slide{
-    margin-top:30px;
-    font-size:40px;
-    background:#111;
-    padding:40px;
-    border-radius:15px;
-}
+.num{ color:#3498db; font-weight:bold; }
 
 .error{ color:#ff4d4d; }
+
+/* predicacion */
+#visor-pdf{
+    width:90%;
+    height:500px;
+    border:none;
+    margin-top:20px;
+}
 </style>
 </head>
 
@@ -116,12 +99,16 @@ textarea{
 
 <!-- INICIO -->
 <div id="p-inicio" class="pantalla activo">
+
+<div class="header">
+<img src="logo.png" class="logo">
 <h1>IGLESIA EVANGÉLICA MISIONERA FDAE</h1>
+</div>
 
 <div class="menu">
 <div class="btn-grande b-azul" onclick="irA('p-biblia')">📖<br>BIBLIA</div>
 <div class="btn-grande b-verde" onclick="irA('p-himno')">🎵<br>HIMNARIO</div>
-<div class="btn-grande b-naranja" onclick="irA('p-predica')">📺<br>PRÉDICA</div>
+<div class="btn-grande b-naranja" onclick="irA('p-predica')">📺<br>PRESENTACIÓN</div>
 </div>
 </div>
 
@@ -130,7 +117,7 @@ textarea{
 <button onclick="irA('p-inicio')">← VOLVER</button>
 <h2>BIBLIA RV1960</h2>
 
-<input id="f-libro" placeholder="Libro (ej: genesis)">
+<input id="f-libro" placeholder="Libro (genesis)">
 <input id="f-cap" placeholder="Capítulo">
 <button onclick="buscar()">BUSCAR</button>
 
@@ -142,26 +129,25 @@ textarea{
 <button onclick="irA('p-inicio')">← VOLVER</button>
 <h2>HIMNARIO</h2>
 
-<input id="h-num" placeholder="Número de himno">
+<input id="h-num" placeholder="Número">
 <button onclick="buscarHimno()">BUSCAR</button>
 
 <div id="visor-h"></div>
 </div>
 
-<!-- PRÉDICA -->
+<!-- PRESENTACIÓN -->
 <div id="p-predica" class="pantalla">
 <button onclick="irA('p-inicio')">← VOLVER</button>
-<h2>PRÉDICA</h2>
+<h2>PRESENTACIÓN</h2>
 
-<textarea id="textoPredica" placeholder="Separar diapositivas con ---"></textarea>
-<br><br>
-<button onclick="crearSlides()">CREAR</button>
+<p>Sube tus diapositivas (PDF recomendado):</p>
 
-<div id="visor-slide"></div>
+<input type="file" id="archivo" accept=".pdf,.ppt,.pptx">
 
 <br>
-<button onclick="anterior()">⬅</button>
-<button onclick="siguiente()">➡</button>
+<button onclick="cargarArchivo()">MOSTRAR</button>
+
+<iframe id="visor-pdf"></iframe>
 </div>
 
 <script>
@@ -176,102 +162,70 @@ document.getElementById(id).classList.add('activo');
 let BIBLIA = {};
 
 async function cargarBiblia(){
-    const res = await fetch("rv1960.json");
-    BIBLIA = await res.json();
+    try{
+        const res = await fetch("rv1960.json");
+        if(!res.ok) throw new Error();
+        BIBLIA = await res.json();
+    }catch{
+        document.getElementById("visor-b").innerHTML =
+        "<div class='error'>Error cargando Biblia</div>";
+    }
 }
 
 function buscar(){
-
 let visor = document.getElementById("visor-b");
 let libro = document.getElementById("f-libro").value.toLowerCase().trim();
 let cap = document.getElementById("f-cap").value.trim();
 
-if(!BIBLIA[libro]){
-    visor.innerHTML = "<div class='error'>❌ Libro no encontrado</div>";
-    return;
-}
+if(!BIBLIA[libro]) return visor.innerHTML="❌ Libro no encontrado";
+if(!BIBLIA[libro][cap]) return visor.innerHTML="❌ Capítulo no encontrado";
 
-if(!BIBLIA[libro][cap]){
-    visor.innerHTML = "<div class='error'>❌ Capítulo no encontrado</div>";
-    return;
-}
-
-let html = "";
-
+let html="";
 for(let v in BIBLIA[libro][cap]){
-    html += `
-    <div class="versiculo">
-    <span class="num">${v}</span>
-    ${BIBLIA[libro][cap][v]}
-    </div>`;
+    html+=`<div class="versiculo"><span class="num">${v}</span>${BIBLIA[libro][cap][v]}</div>`;
+}
+visor.innerHTML=html;
 }
 
-visor.innerHTML = html;
-}
-
-/* ================= HIMNARIO ================= */
+/* ================= HIMNOS ================= */
 let HIMNOS = {};
 
 async function cargarHimnos(){
-    const res = await fetch("himnos.json");
-    HIMNOS = await res.json();
+    try{
+        const res = await fetch("himnos.json");
+        if(!res.ok) throw new Error();
+        HIMNOS = await res.json();
+    }catch{
+        document.getElementById("visor-h").innerHTML =
+        "<div class='error'>Error cargando himnos</div>";
+    }
 }
 
 function buscarHimno(){
-
 let num = document.getElementById("h-num").value;
 let visor = document.getElementById("visor-h");
 
-if(!HIMNOS[num]){
-    visor.innerHTML = "<div class='error'>❌ Himno no encontrado</div>";
-    return;
-}
+if(!HIMNOS[num]) return visor.innerHTML="❌ No encontrado";
 
 let h = HIMNOS[num];
-
-visor.innerHTML = `
-<h3>${h.titulo}</h3>
-<p style="white-space:pre-line;">${h.letra}</p>
-`;
+visor.innerHTML = `<h3>${h.titulo}</h3><p style="white-space:pre-line;">${h.letra}</p>`;
 }
 
-/* ================= PRÉDICA ================= */
-let slides = [];
-let actual = 0;
+/* ================= PRESENTACIÓN ================= */
+function cargarArchivo(){
+let archivo = document.getElementById("archivo").files[0];
+if(!archivo) return alert("Selecciona un archivo");
 
-function crearSlides(){
-let texto = document.getElementById("textoPredica").value;
-slides = texto.split("---");
-actual = 0;
-mostrarSlide();
+let url = URL.createObjectURL(archivo);
+document.getElementById("visor-pdf").src = url;
 }
 
-function mostrarSlide(){
-let visor = document.getElementById("visor-slide");
-if(slides.length === 0){
-    visor.innerHTML = "Sin contenido";
-    return;
+/* INICIO */
+async function iniciar(){
+    await cargarBiblia();
+    await cargarHimnos();
 }
-visor.innerHTML = slides[actual];
-}
-
-function siguiente(){
-if(actual < slides.length - 1){
-    actual++;
-    mostrarSlide();
-}
-}
-
-function anterior(){
-if(actual > 0){
-    actual--;
-    mostrarSlide();
-}
-}
-
-/* cargar todo */
-cargarBiblia();
-cargarHimnos();
+iniciar();
 
 </script>
 
