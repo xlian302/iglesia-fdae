@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>IGLESIA FDAE</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Merriweather&display=swap" rel="stylesheet">
+
+<style>
+body{
+    background:#000;
+    color:white;
+    font-family:'Merriweather', serif;
+    text-align:center;
+}
+
+/* pantallas */
+.pantalla{ display:none; padding:40px; }
+.activo{ display:block; }
+
+/* menú */
+.menu{
+    display:flex;
+    justify-content:center;
+    gap:25px;
+    margin-top:40px;
+}
+
+.btn-grande{
+    width:220px;
+    height:220px;
+    border-radius:20px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    font-size:22px;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+.btn-grande:hover{ transform:scale(1.05); }
+
+.b-azul{background:#3498db;}
+.b-verde{background:#2ecc71;}
+.b-naranja{background:#e67e22;}
+
+/* inputs */
+input{
+    padding:12px;
+    border-radius:10px;
+    border:none;
+    margin:10px;
+    font-size:18px;
+    width:200px;
+}
+
+button{
+    padding:12px 20px;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+}
+
+/* visor biblia */
+#visor-b{
+    margin-top:30px;
+    max-width:900px;
+    margin:auto;
+    font-size:22px;
+}
+
+.versiculo{
+    margin:15px;
+    padding:15px;
+    background:#111;
+    border-left:5px solid #3498db;
+    border-radius:10px;
+    text-align:left;
+}
+
+.num{
+    color:#3498db;
+    font-weight:bold;
+    margin-right:10px;
+}
+
+/* himnario */
+#visor-h{
+    margin-top:20px;
+    max-width:800px;
+    margin:auto;
+    font-size:22px;
+}
+
+/* predica */
+textarea{
+    width:80%;
+    height:150px;
+    border-radius:10px;
+    padding:10px;
+}
+
+#visor-slide{
+    margin-top:30px;
+    font-size:40px;
+    background:#111;
+    padding:40px;
+    border-radius:15px;
+}
+
+.error{ color:#ff4d4d; }
+</style>
+</head>
+
+<body>
+
+<!-- INICIO -->
+<div id="p-inicio" class="pantalla activo">
+<h1>IGLESIA EVANGÉLICA MISIONERA FDAE</h1>
+
+<div class="menu">
+<div class="btn-grande b-azul" onclick="irA('p-biblia')">📖<br>BIBLIA</div>
+<div class="btn-grande b-verde" onclick="irA('p-himno')">🎵<br>HIMNARIO</div>
+<div class="btn-grande b-naranja" onclick="irA('p-predica')">📺<br>PRÉDICA</div>
+</div>
+</div>
+
+<!-- BIBLIA -->
+<div id="p-biblia" class="pantalla">
+<button onclick="irA('p-inicio')">← VOLVER</button>
+<h2>BIBLIA RV1960</h2>
+
+<input id="f-libro" placeholder="Libro (ej: genesis)">
+<input id="f-cap" placeholder="Capítulo">
+<button onclick="buscar()">BUSCAR</button>
+
+<div id="visor-b"></div>
+</div>
+
+<!-- HIMNARIO -->
+<div id="p-himno" class="pantalla">
+<button onclick="irA('p-inicio')">← VOLVER</button>
+<h2>HIMNARIO</h2>
+
+<input id="h-num" placeholder="Número de himno">
+<button onclick="buscarHimno()">BUSCAR</button>
+
+<div id="visor-h"></div>
+</div>
+
+<!-- PRÉDICA -->
+<div id="p-predica" class="pantalla">
+<button onclick="irA('p-inicio')">← VOLVER</button>
+<h2>PRÉDICA</h2>
+
+<textarea id="textoPredica" placeholder="Separar diapositivas con ---"></textarea>
+<br><br>
+<button onclick="crearSlides()">CREAR</button>
+
+<div id="visor-slide"></div>
+
+<br>
+<button onclick="anterior()">⬅</button>
+<button onclick="siguiente()">➡</button>
+</div>
+
+<script>
+
+/* navegación */
+function irA(id){
+document.querySelectorAll('.pantalla').forEach(p=>p.classList.remove('activo'));
+document.getElementById(id).classList.add('activo');
+}
+
+/* ================= BIBLIA ================= */
+let BIBLIA = {};
+
+async function cargarBiblia(){
+    const res = await fetch("rv1960.json");
+    BIBLIA = await res.json();
+}
+
+function buscar(){
+
+let visor = document.getElementById("visor-b");
+let libro = document.getElementById("f-libro").value.toLowerCase().trim();
+let cap = document.getElementById("f-cap").value.trim();
+
+if(!BIBLIA[libro]){
+    visor.innerHTML = "<div class='error'>❌ Libro no encontrado</div>";
+    return;
+}
+
+if(!BIBLIA[libro][cap]){
+    visor.innerHTML = "<div class='error'>❌ Capítulo no encontrado</div>";
+    return;
+}
+
+let html = "";
+
+for(let v in BIBLIA[libro][cap]){
+    html += `
+    <div class="versiculo">
+    <span class="num">${v}</span>
+    ${BIBLIA[libro][cap][v]}
+    </div>`;
+}
+
+visor.innerHTML = html;
+}
+
+/* ================= HIMNARIO ================= */
+let HIMNOS = {};
+
+async function cargarHimnos(){
+    const res = await fetch("himnos.json");
+    HIMNOS = await res.json();
+}
+
+function buscarHimno(){
+
+let num = document.getElementById("h-num").value;
+let visor = document.getElementById("visor-h");
+
+if(!HIMNOS[num]){
+    visor.innerHTML = "<div class='error'>❌ Himno no encontrado</div>";
+    return;
+}
+
+let h = HIMNOS[num];
+
+visor.innerHTML = `
+<h3>${h.titulo}</h3>
+<p style="white-space:pre-line;">${h.letra}</p>
+`;
+}
+
+/* ================= PRÉDICA ================= */
+let slides = [];
+let actual = 0;
+
+function crearSlides(){
+let texto = document.getElementById("textoPredica").value;
+slides = texto.split("---");
+actual = 0;
+mostrarSlide();
+}
+
+function mostrarSlide(){
+let visor = document.getElementById("visor-slide");
+if(slides.length === 0){
+    visor.innerHTML = "Sin contenido";
+    return;
+}
+visor.innerHTML = slides[actual];
+}
+
+function siguiente(){
+if(actual < slides.length - 1){
+    actual++;
+    mostrarSlide();
+}
+}
+
+function anterior(){
+if(actual > 0){
+    actual--;
+    mostrarSlide();
+}
+}
+
+/* cargar todo */
+cargarBiblia();
+cargarHimnos();
+
+</script>
+
+</body>
+</html>
