@@ -14,7 +14,6 @@ body{
     text-align:center;
 }
 
-/* header */
 .header{
     display:flex;
     align-items:center;
@@ -24,15 +23,13 @@ body{
 }
 
 .logo{
-    width:60px;
-    height:60px;
+    width:70px;
+    height:70px;
 }
 
-/* pantallas */
 .pantalla{ display:none; padding:40px; }
 .activo{ display:block; }
 
-/* menú */
 .menu{
     display:flex;
     justify-content:center;
@@ -85,7 +82,6 @@ input, button{
 
 .error{ color:#ff4d4d; }
 
-/* predicacion */
 #visor-pdf{
     width:90%;
     height:500px;
@@ -147,7 +143,11 @@ input, button{
 <br>
 <button onclick="cargarArchivo()">MOSTRAR</button>
 
+<div id="visor-container">
 <iframe id="visor-pdf"></iframe>
+</div>
+
+<div id="mensaje"></div>
 </div>
 
 <script>
@@ -163,13 +163,13 @@ let BIBLIA = {};
 
 async function cargarBiblia(){
     try{
-        const res = await fetch("./rv1960.json");
         const res = await fetch("https://xlian302.github.io/iglesia-fdae/rv1960.json");
         if(!res.ok) throw new Error();
         BIBLIA = await res.json();
+        console.log("Biblia cargada");
     }catch{
         document.getElementById("visor-b").innerHTML =
-        "<div class='error'>Error cargando Biblia</div>";
+        "<div class='error'>❌ Error cargando Biblia</div>";
     }
 }
 
@@ -193,12 +193,12 @@ let HIMNOS = {};
 
 async function cargarHimnos(){
     try{
-        const res = await fetch("himnos.json");
+        const res = await fetch("https://xlian302.github.io/iglesia-fdae/himnos.json");
         if(!res.ok) throw new Error();
         HIMNOS = await res.json();
     }catch{
         document.getElementById("visor-h").innerHTML =
-        "<div class='error'>Error cargando himnos</div>";
+        "<div class='error'>❌ Error cargando himnos</div>";
     }
 }
 
@@ -215,10 +215,21 @@ visor.innerHTML = `<h3>${h.titulo}</h3><p style="white-space:pre-line;">${h.letr
 /* ================= PRESENTACIÓN ================= */
 function cargarArchivo(){
 let archivo = document.getElementById("archivo").files[0];
+let visor = document.getElementById("visor-pdf");
+let mensaje = document.getElementById("mensaje");
+
 if(!archivo) return alert("Selecciona un archivo");
 
-let url = URL.createObjectURL(archivo);
-document.getElementById("visor-pdf").src = url;
+let tipo = archivo.type;
+
+if(tipo === "application/pdf"){
+    let url = URL.createObjectURL(archivo);
+    visor.src = url;
+    mensaje.innerHTML = "";
+}else{
+    visor.src = "";
+    mensaje.innerHTML = "⚠️ PowerPoint no se puede mostrar aquí. Usa PDF o ábrelo manualmente.";
+}
 }
 
 /* INICIO */
