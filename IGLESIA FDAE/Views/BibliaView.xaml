@@ -1,0 +1,57 @@
+﻿<Page x:Class="IGLESIA_FDAE.Views.BibliaView"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Background="#0A0A0A">
+
+    <Grid Margin="20">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="80"/>
+            <RowDefinition Height="70"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock
+            Text="📖 Biblia"
+            FontSize="32"
+            FontWeight="Bold"
+            Foreground="White"/>
+
+        <StackPanel Grid.Row="1"
+                    Orientation="Horizontal">
+
+            <ComboBox
+                x:Name="cmbLibro"
+                Width="250"
+                Height="40"
+                Margin="0,0,10,0"
+                SelectionChanged="cmbLibro_SelectionChanged"/>
+
+            <ComboBox
+                x:Name="cmbCapitulo"
+                Width="120"
+                Height="40"
+                SelectionChanged="cmbCapitulo_SelectionChanged"/>
+
+        </StackPanel>
+        <Button
+    Content="← Volver"
+    Margin="190,10,94,40"
+    Click="Volver_Click" RenderTransformOrigin="0.694,0.555"/>
+
+        <Border Grid.Row="2"
+                Background="#161616"
+                CornerRadius="10"
+                Padding="10">
+
+            <ListBox
+                x:Name="ListaVersiculos"
+                Background="#161616"
+                Foreground="White"
+                BorderThickness="0"/>
+
+        </Border>
+
+    </Grid>
+
+</Page>

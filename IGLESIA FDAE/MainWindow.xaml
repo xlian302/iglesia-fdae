@@ -1,0 +1,15 @@
+﻿<Window x:Class="IGLESIA_FDAE.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="IGLESIA EVANGÉLICA MISIONERA FDAE"
+        Width="1280"
+        Height="800"
+        WindowStartupLocation="CenterScreen"
+        Background="#111111">
+
+    <Grid>
+        <Frame x:Name="MainFrame"
+               NavigationUIVisibility="Hidden"/>
+    </Grid>
+
+</Window>

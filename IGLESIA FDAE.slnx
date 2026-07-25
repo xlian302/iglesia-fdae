@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/assets/">
+    <File Path="../../../Documents/Html.pro/web/logo.png" />
+  </Folder>
+  <Folder Name="/Data/" />
+  <Folder Name="/Models/" />
+  <Folder Name="/Services/" />
+  <Project Path="IGLESIA FDAE/IGLESIA FDAE.csproj" />
+</Solution>
