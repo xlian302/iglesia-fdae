@@ -908,7 +908,15 @@ function cargarCapitulo(){
 
     }
 
-    let libro = partes.join(" ");
+    let libroRaw = partes.join(" ");
+
+    let libro = libroRaw;
+
+    if(!BIBLIA[libro]){
+
+        libro = libroRaw.replace(/ /g, "_");
+
+    }
 
     if(!BIBLIA[libro]){
 
