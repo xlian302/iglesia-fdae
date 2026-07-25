@@ -1,0 +1,1386 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>FDAE WEB.SERVICE</title>
+
+<style>
+
+/* ================= GENERAL ================= */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+html{
+    scroll-behavior:smooth;
+}
+
+body{
+    background:#000;
+    color:#fff;
+    font-family:Arial, sans-serif;
+    overflow-x:hidden;
+}
+
+/* ================= HEADER ================= */
+
+.header{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:15px;
+    padding:20px;
+    background:#111;
+    border-bottom:2px solid #222;
+}
+
+.logo{
+    width:70px;
+    height:70px;
+    border-radius:50%;
+    object-fit:cover;
+}
+
+.titulo{
+    font-size:30px;
+    font-weight:bold;
+    text-align:center;
+}
+
+/* ================= PANTALLAS ================= */
+
+.pantalla{
+    display:none;
+    min-height:100vh;
+    padding:30px;
+}
+
+.activo{
+    display:block;
+}
+
+/* ================= MENU ================= */
+
+.menu{
+    display:flex;
+    justify-content:center;
+    flex-wrap:wrap;
+    gap:25px;
+    margin-top:50px;
+}
+
+.btn{
+    width:220px;
+    height:220px;
+    border-radius:25px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-direction:column;
+    font-size:24px;
+    font-weight:bold;
+    cursor:pointer;
+    transition:0.3s;
+    user-select:none;
+}
+
+.btn:hover{
+    transform:scale(1.05);
+}
+
+.azul{
+    background:#3498db;
+}
+
+.verde{
+    background:#2ecc71;
+}
+
+.naranja{
+    background:#e67e22;
+}
+
+/* ================= INPUTS ================= */
+
+input,
+button{
+    padding:12px;
+    border:none;
+    border-radius:10px;
+    margin:10px;
+    font-size:18px;
+}
+
+button{
+    cursor:pointer;
+}
+
+/* ================= VISOR ================= */
+
+#visorBiblia,
+#visorHimno,
+#resultadosBusqueda{
+    max-width:1200px;
+    margin:auto;
+    margin-top:25px;
+}
+
+/* ================= VERSICULOS ================= */
+
+.versiculo{
+    background:#111;
+    margin:12px 0;
+    padding:18px;
+    border-left:5px solid #3498db;
+    border-radius:12px;
+    text-align:left;
+    font-size:22px;
+    line-height:1.7;
+}
+
+.num{
+    color:#3498db;
+    font-weight:bold;
+    margin-right:10px;
+}
+
+/* ================= HIMNOS ================= */
+
+pre{
+    white-space:pre-wrap;
+    text-align:left;
+    background:#111;
+    padding:20px;
+    border-radius:12px;
+    font-size:22px;
+    line-height:1.7;
+}
+
+/* ================= BUSCADOR ================= */
+
+.resultado-busqueda{
+    background:#111;
+    margin:15px 0;
+    padding:18px;
+    border-left:5px solid #e67e22;
+    border-radius:12px;
+    text-align:left;
+    font-size:20px;
+    line-height:1.6;
+}
+
+/* ================= PREDICADOR ================= */
+
+.predicador-lista{
+    width:100%;
+    padding:120px 40px;
+}
+
+.predica-item{
+
+    margin:220px 0;
+
+    opacity:0.15;
+
+    transform:scale(0.82);
+
+    transition:
+        opacity 0.4s,
+        transform 0.4s;
+
+    text-align:center;
+
+}
+
+.versiculo-activo{
+
+    opacity:1;
+
+    transform:scale(1);
+
+.coro-activo{
+
+    border-left:8px solid #2ecc71;
+
+    padding-left:30px;
+
+}
+
+}
+
+.predica-ref{
+
+    font-size:42px;
+
+    color:#3498db;
+
+    margin-bottom:35px;
+
+    font-weight:bold;
+
+}
+
+.predica-texto{
+
+    font-size:85px;
+
+    line-height:1.5;
+
+    font-weight:bold;
+
+    max-width:1600px;
+
+    margin:auto;
+
+}
+
+/* ================= FLECHAS ================= */
+
+.flecha-control{
+
+    position:fixed;
+
+    z-index:999999999;
+
+    right:25px;
+
+    width:85px;
+
+    height:85px;
+
+    border-radius:50%;
+
+    background:rgba(20,20,20,0.95);
+
+    border:4px solid #3498db;
+
+    color:#3498db;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    font-size:45px;
+
+    font-weight:bold;
+
+    cursor:pointer;
+
+    transition:0.3s;
+
+    user-select:none;
+
+    box-shadow:
+        0 0 25px rgba(0,0,0,0.8),
+        0 0 15px #3498db;
+
+    backdrop-filter:blur(8px);
+
+}
+
+.flecha-control:hover{
+
+    background:#3498db;
+
+    color:#fff;
+
+    transform:scale(1.1);
+
+}
+
+#flechaArriba{
+
+    bottom:150px;
+
+}
+
+#flechaAbajo{
+
+    bottom:40px;
+
+}
+
+/* ================= INDICADOR ================= */
+
+.indicador-versiculo{
+
+    position:fixed;
+
+    top:20px;
+
+    right:20px;
+
+    z-index:999999999;
+
+    background:rgba(0,0,0,0.8);
+
+    border:2px solid #3498db;
+
+    color:#fff;
+
+    padding:12px 20px;
+
+    border-radius:15px;
+
+    font-size:20px;
+
+    font-weight:bold;
+
+    backdrop-filter:blur(8px);
+
+}
+
+/* ================= ANIMACION ================= */
+
+@keyframes aparecer{
+
+    from{
+
+        opacity:0;
+        transform:translateY(30px);
+
+    }
+
+    to{
+
+        opacity:1;
+        transform:translateY(0);
+
+    }
+
+}
+
+.versiculo-activo .predica-texto{
+
+    animation:aparecer 0.4s ease;
+
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media(max-width:768px){
+
+    .btn{
+        width:170px;
+        height:170px;
+        font-size:20px;
+    }
+
+    .predica-texto{
+        font-size:42px;
+    }
+
+    .predica-ref{
+        font-size:28px;
+    }
+
+    .titulo{
+        font-size:22px;
+    }
+
+    .flecha-control{
+
+        width:65px;
+
+        height:65px;
+
+        font-size:32px;
+
+        right:15px;
+
+    }
+
+    #flechaArriba{
+
+        bottom:110px;
+
+    }
+
+    #flechaAbajo{
+
+        bottom:25px;
+
+    }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- ================= INICIO ================= -->
+
+<div id="inicio" class="pantalla activo">
+
+    <div class="header">
+
+        <img src="logo.png" class="logo">
+
+        <div class="titulo">
+            IGLESIA EVANGÉLICA MISIONERA FDAE
+        </div>
+
+    </div>
+
+    <div class="menu">
+
+        <div class="btn azul" onclick="ir('biblia')">
+            📖<br>BIBLIA
+        </div>
+
+        <div class="btn verde" onclick="ir('himnos')">
+            🎵<br>HIMNARIO
+        </div>
+
+        <div class="btn naranja" onclick="ir('buscador')">
+            🔍<br>BUSCADOR
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ================= BIBLIA ================= -->
+
+<div id="biblia" class="pantalla">
+
+    <button onclick="ir('inicio')">
+        ← VOLVER
+    </button>
+
+    <h1>BIBLIA RV1960</h1>
+
+    <input
+        id="busquedaBiblia"
+        placeholder="Ej: juan 3"
+        autocomplete="off"
+    >
+
+    <button onclick="cargarCapitulo()">
+        BUSCAR
+    </button>
+
+    <button onclick="activarPredicador()">
+        MODO PREDICADOR
+    </button>
+
+    <div id="visorBiblia"></div>
+
+</div>
+
+<!-- ================= HIMNOS ================= -->
+
+<div id="himnos" class="pantalla">
+
+    <button onclick="ir('inicio')">
+        ← VOLVER
+    </button>
+
+    <h1>HIMNARIO</h1>
+
+    <input
+        id="numHimno"
+        placeholder="Número del himno"
+        autocomplete="off"
+    >
+
+    <button onclick="buscarHimno()">
+        BUSCAR
+    </button>
+
+    <button onclick="activarPredicadorHimno()">
+        MODO PREDICADOR
+    </button>
+
+    <div id="visorHimno"></div>
+
+</div>
+
+<!-- ================= BUSCADOR ================= -->
+
+function dividirHimno(letra){
+
+    letra = letra.replace(/\r/g,"");
+
+    let coro = "";
+
+    let coroMatch =
+        letra.match(
+            /CORO([\s\S]*?)(?=\n\d+\.\s|$)/i
+        );
+
+    if(coroMatch){
+
+        coro =
+            "CORO\n" +
+            coroMatch[1].trim();
+
+    }
+
+    let estrofas =
+        letra.match(
+            /\d+\.[\s\S]*?(?=\n\d+\.\s|$)/g
+        ) || [];
+
+    let resultado = [];
+
+    estrofas.forEach((e,i)=>{
+
+        resultado.push(
+            e.trim()
+        );
+
+        if(coro){
+
+            resultado.push(
+                coro
+            );
+
+        }
+
+    });
+
+    return resultado;
+
+}
+
+function activarPredicadorHimno(){
+
+    let numero =
+        document
+        .getElementById("numHimno")
+        .value
+        .trim();
+
+    let h = HIMNOS[numero];
+
+    if(!h){
+
+        alert(
+            "Busca un himno primero"
+        );
+
+        return;
+
+    }
+
+    tituloHimno =
+        h.titulo;
+
+    partesHimno =
+        dividirHimno(
+            h.letra
+        );
+
+    indiceHimno = 0;
+
+    modoHimno = true;
+
+    document.body.style.overflow =
+        "hidden";
+
+    mostrarFlechas();
+
+    renderPredicadorHimno();
+
+}
+
+function renderPredicadorHimno(){
+
+    let html = `
+        <div class="predicador-lista">
+    `;
+
+    partesHimno.forEach((p,i)=>{
+
+        let activo =
+            i === indiceHimno
+            ? "versiculo-activo"
+            : "";
+
+        let coro =
+            p.startsWith("CORO")
+            ? "coro-activo"
+            : "";
+
+        html += `
+
+            <div
+                class="
+                    predica-item
+                    ${activo}
+                    ${coro}
+                "
+                id="himno-${i}"
+            >
+
+                <div class="predica-ref">
+
+                    🎵
+                    ${tituloHimno}
+
+                </div>
+
+                <div class="predica-texto">
+
+                    ${p.replace(
+                        /\n/g,
+                        "<br>"
+                    )}
+
+                </div>
+
+            </div>
+
+        `;
+
+    });
+
+    html += `
+        </div>
+    `;
+
+    document
+        .getElementById(
+            "visorHimno"
+        )
+        .innerHTML = html;
+
+    actualizarActivoHimno();
+
+}
+
+function actualizarActivoHimno(){
+
+    document
+        .querySelectorAll(
+            '[id^="himno-"]'
+        )
+        .forEach(el=>{
+
+            el.classList.remove(
+                "versiculo-activo"
+            );
+
+        });
+
+    let actual =
+        document
+        .getElementById(
+            `himno-${indiceHimno}`
+        );
+
+    if(actual){
+
+        actual.classList.add(
+            "versiculo-activo"
+        );
+
+        actual.scrollIntoView({
+
+            behavior:"smooth",
+
+            block:"center"
+
+        });
+
+    }
+
+    document
+        .getElementById(
+            "indicadorVersiculo"
+        )
+        .innerHTML = `
+            🎵
+            ${indiceHimno+1}
+            /
+            ${partesHimno.length}
+        `;
+
+}
+
+function siguienteHimno(){
+
+    if(
+        indiceHimno <
+        partesHimno.length - 1
+    ){
+
+        indiceHimno++;
+
+        actualizarActivoHimno();
+
+    }
+
+}
+
+function anteriorHimno(){
+
+    if(indiceHimno > 0){
+
+        indiceHimno--;
+
+        actualizarActivoHimno();
+
+    }
+
+}
+
+function controlAnterior(){
+
+    if(modoHimno){
+
+        anteriorHimno();
+
+    }else{
+
+        versiculoAnterior();
+
+    }
+
+}
+
+function controlSiguiente(){
+
+    if(modoHimno){
+
+        siguienteHimno();
+
+    }else{
+
+        controlSiguiente();
+
+    }
+
+}
+
+<div id="buscador" class="pantalla">
+
+    <button onclick="ir('inicio')">
+        ← VOLVER
+    </button>
+
+    <h1>BUSCADOR BÍBLICO</h1>
+
+    <input
+        id="textoBusqueda"
+        placeholder="Buscar palabra o frase"
+        autocomplete="off"
+    >
+
+    <button onclick="buscarTextoBiblico()">
+        BUSCAR
+    </button>
+
+    <div id="resultadosBusqueda"></div>
+
+</div>
+
+<!-- ================= FLECHAS ================= -->
+
+<div
+    id="flechaArriba"
+    class="flecha-control"
+    onclick="controlAnterior()"
+    style="display:none;"
+>
+    ↑
+</div>
+
+<div
+    id="flechaAbajo"
+    class="flecha-control"
+    onclick="controlSiguiente()"
+    style="display:none;"
+>
+    ↓
+</div>
+
+<!-- ================= INDICADOR ================= -->
+
+<div
+    id="indicadorVersiculo"
+    class="indicador-versiculo"
+    style="display:none;"
+>
+    1 / 1
+</div>
+
+<!-- ================= BASE DATOS ================= -->
+
+<script src="biblia.js"></script>
+<script src="himnos.js"></script>
+
+<!-- ================= APP ================= -->
+
+<script>
+
+/* ================= ANTI ERRORES ================= */
+
+window.onerror = function(msg, url, line){
+
+    console.log("ERROR:", msg);
+    console.log("URL:", url);
+    console.log("LINEA:", line);
+
+    alert("⚠️ Ocurrió un error en la aplicación");
+
+};
+
+/* ================= VARIABLES ================= */
+
+let versiculos = [];
+let indice = 0;
+let libroActual = "";
+let capActual = "";
+let partesHimno = [];
+let indiceHimno = 0;
+let tituloHimno = "";
+let modoHimno = false;
+
+/* ================= NAVEGACION ================= */
+
+function ir(id){
+
+    document
+        .querySelectorAll(".pantalla")
+        .forEach(p => p.classList.remove("activo"));
+
+    document
+        .getElementById(id)
+        .classList.add("activo");
+
+}
+
+/* ================= LIMPIAR ================= */
+
+function limpiar(txt){
+
+    return txt
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .trim();
+
+}
+
+/* ================= CARGAR CAPITULO ================= */
+
+function cargarCapitulo(){
+
+    let input = limpiar(
+        document.getElementById("busquedaBiblia").value
+    );
+
+    let partes = input
+        .split(" ")
+        .filter(p => p !== "");
+
+    if(partes.length < 2){
+
+        alert("Escribe: libro + capítulo (ej: juan 3)");
+        return;
+
+    }
+
+    let ultima = partes.pop();
+
+    let ver = null;
+
+    if(ultima.includes(":")){
+
+        let partesVer = ultima.split(":");
+
+        ultima = partesVer[0];
+
+        ver = partesVer[1];
+
+    }
+
+    let libro = partes.join(" ");
+
+    if(!BIBLIA[libro]){
+
+        alert("❌ Libro no encontrado");
+        return;
+
+    }
+
+    if(!BIBLIA[libro][ultima]){
+
+        alert("❌ Capítulo no encontrado");
+        return;
+
+    }
+
+    libroActual = libro;
+    capActual = ultima;
+
+    if(ver){
+
+        if(!BIBLIA[libro][ultima][ver]){
+
+            alert("❌ Versículo no encontrado");
+            return;
+
+        }
+
+        versiculos = [
+            [ver, BIBLIA[libro][ultima][ver]]
+        ];
+
+    } else {
+
+        versiculos = Object.entries(
+            BIBLIA[libro][ultima]
+        );
+
+    }
+
+    indice = 0;
+
+    mostrarNormal();
+
+}
+
+/* ================= MOSTRAR NORMAL ================= */
+
+function mostrarNormal(){
+
+    ocultarFlechas();
+
+    let html = "";
+
+    for(let v of versiculos){
+
+        html += `
+            <div class="versiculo">
+                <span class="num">${v[0]}</span>
+                ${v[1]}
+            </div>
+        `;
+
+    }
+
+    document
+        .getElementById("visorBiblia")
+        .innerHTML = html;
+
+}
+
+/* ================= ACTIVAR PREDICADOR ================= */
+
+function activarPredicador(){
+
+    modoHimno = false;
+
+    if(versiculos.length === 0){
+
+        alert("Carga un capítulo primero");
+        return;
+
+    }
+
+    indice = 0;
+
+    document.body.style.overflow = "hidden";
+
+    mostrarFlechas();
+
+    renderPredicador();
+
+}
+
+/* ================= RENDER ================= */
+
+function renderPredicador(){
+
+    let html = `
+        <div class="predicador-lista">
+    `;
+
+    versiculos.forEach((v, i) => {
+
+        let activo = i === indice
+            ? "versiculo-activo"
+            : "";
+
+        html += `
+
+            <div
+                class="predica-item ${activo}"
+                id="versiculo-${i}"
+            >
+
+                <div class="predica-ref">
+                    ${libroActual}
+                    ${capActual}:${v[0]}
+                </div>
+
+                <div class="predica-texto">
+                    ${v[1]}
+                </div>
+
+            </div>
+
+        `;
+
+    });
+
+    html += `</div>`;
+
+    document
+        .getElementById("visorBiblia")
+        .innerHTML = html;
+
+    actualizarActivo();
+
+}
+
+/* ================= ACTUALIZAR ================= */
+
+function actualizarActivo(){
+
+    document
+        .querySelectorAll(".predica-item")
+        .forEach(el => {
+
+            el.classList.remove(
+                "versiculo-activo"
+            );
+
+        });
+
+    let actual = document.getElementById(
+        `versiculo-${indice}`
+    );
+
+    if(actual){
+
+        actual.classList.add(
+            "versiculo-activo"
+        );
+
+        actual.scrollIntoView({
+
+            behavior:"smooth",
+            block:"center"
+
+        });
+
+    }
+
+    actualizarIndicador();
+
+}
+
+/* ================= INDICADOR ================= */
+
+function actualizarIndicador(){
+
+    document.getElementById(
+        "indicadorVersiculo"
+    ).innerHTML = `
+        ${indice + 1}
+        /
+        ${versiculos.length}
+    `;
+
+}
+
+/* ================= SIGUIENTE ================= */
+
+function versiculoSiguiente(){
+
+    if(indice < versiculos.length - 1){
+
+        indice++;
+
+        actualizarActivo();
+
+    }
+
+}
+
+/* ================= ANTERIOR ================= */
+
+function versiculoAnterior(){
+
+    if(indice > 0){
+
+        indice--;
+
+        actualizarActivo();
+
+    }
+
+}
+
+/* ================= MOSTRAR FLECHAS ================= */
+
+function mostrarFlechas(){
+
+    document.getElementById(
+        "flechaArriba"
+    ).style.display = "flex";
+
+    document.getElementById(
+        "flechaAbajo"
+    ).style.display = "flex";
+
+    document.getElementById(
+        "indicadorVersiculo"
+    ).style.display = "block";
+
+}
+
+/* ================= OCULTAR FLECHAS ================= */
+
+function ocultarFlechas(){
+
+    document.getElementById(
+        "flechaArriba"
+    ).style.display = "none";
+
+    document.getElementById(
+        "flechaAbajo"
+    ).style.display = "none";
+
+    document.getElementById(
+        "indicadorVersiculo"
+    ).style.display = "none";
+
+}
+
+/* ================= SALIR ================= */
+
+function salirPredicador(){
+
+    document.body.style.overflow = "auto";
+
+    ocultarFlechas();
+
+    mostrarNormal();
+
+}
+
+/* ================= TECLADO ================= */
+
+document.addEventListener("keydown", e => {
+
+    let modoPredicador =
+        document.getElementById("flechaAbajo")
+        .style.display === "flex";
+
+    if(modoPredicador){
+
+        if(
+            e.key === "ArrowRight" ||
+            e.key === "ArrowDown" ||
+            e.code === "Space"
+        ){
+
+            e.preventDefault();
+
+            controlSiguiente();
+
+        }
+
+        if(
+            e.key === "ArrowLeft" ||
+            e.key === "ArrowUp"
+        ){
+
+            e.preventDefault();
+
+            versiculoAnterior();
+
+        }
+
+        if(e.key === "Home"){
+
+            indice = 0;
+
+            actualizarActivo();
+
+        }
+
+        if(e.key === "End"){
+
+            indice = versiculos.length - 1;
+
+            actualizarActivo();
+
+        }
+
+        if(e.key === "Escape"){
+
+            salirPredicador();
+
+        }
+
+    }
+
+});
+
+/* ================= HIMNOS ================= */
+
+function buscarHimno(){
+
+    let numero = document
+        .getElementById("numHimno")
+        .value
+        .trim();
+
+    let h = HIMNOS[numero];
+
+    if(!h){
+
+        document.getElementById(
+            "visorHimno"
+        ).innerHTML = "❌ Himno no encontrado";
+
+        return;
+
+    }
+
+    document.getElementById(
+        "visorHimno"
+    ).innerHTML = `
+
+        <h2 style="margin-bottom:20px;">
+            ${h.titulo}
+        </h2>
+
+        <pre>${h.letra}</pre>
+
+    `;
+
+}
+
+/* ================= BUSCADOR ================= */
+
+function buscarTextoBiblico(){
+
+    let texto = limpiar(
+        document.getElementById("textoBusqueda").value
+    );
+
+    if(texto === ""){
+
+        alert("Escribe algo para buscar");
+        return;
+
+    }
+
+    let resultados = [];
+
+    for(let libro in BIBLIA){
+
+        for(let capitulo in BIBLIA[libro]){
+
+            for(let versiculo in BIBLIA[libro][capitulo]){
+
+                let contenido =
+                    BIBLIA[libro][capitulo][versiculo];
+
+                let limpio = limpiar(contenido);
+
+                if(limpio.includes(texto)){
+
+                    resultados.push({
+
+                        libro,
+                        capitulo,
+                        versiculo,
+                        contenido
+
+                    });
+
+                }
+
+            }
+
+        }
+
+    }
+
+    mostrarResultadosBusqueda(resultados);
+
+}
+
+/* ================= RESULTADOS ================= */
+
+function mostrarResultadosBusqueda(resultados){
+
+    let visor =
+        document.getElementById("resultadosBusqueda");
+
+    if(resultados.length === 0){
+
+        visor.innerHTML =
+            "<h2>❌ No se encontraron resultados</h2>";
+
+        return;
+
+    }
+
+    let html = `
+        <h2>
+            Resultados encontrados:
+            ${resultados.length}
+        </h2>
+    `;
+
+    resultados
+        .slice(0,200)
+        .forEach(r => {
+
+        html += `
+
+            <div class="resultado-busqueda">
+
+                <b>
+                    ${r.libro}
+                    ${r.capitulo}:${r.versiculo}
+                </b>
+
+                <br><br>
+
+                ${r.contenido}
+
+            </div>
+
+        `;
+
+    });
+
+    visor.innerHTML = html;
+
+}
+
+/* ================= VERIFICACION ================= */
+
+console.log("✅ Biblia cargada");
+console.log("✅ Himnos cargados");
+
+console.log(
+    "Libros:",
+    Object.keys(BIBLIA).slice(0,10)
+);
+
+</script>
+
+</body>
+</html>
