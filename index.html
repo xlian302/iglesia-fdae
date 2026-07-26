@@ -739,34 +739,6 @@ function anteriorHimno(){
 
 }
 
-function controlAnterior(){
-
-    if(modoHimno){
-
-        anteriorHimno();
-
-    }else{
-
-        versiculoAnterior();
-
-    }
-
-}
-
-function controlSiguiente(){
-
-    if(modoHimno){
-
-        siguienteHimno();
-
-    }else{
-
-        controlSiguiente();
-
-    }
-
-}
-
 </script>
 
 <div id="buscador" class="pantalla">
@@ -853,6 +825,150 @@ let indiceHimno = 0;
 let tituloHimno = "";
 let modoHimno = false;
 
+/* ================= ORDEN LIBROS ================= */
+
+const ORDEN_LIBROS = [
+    "genesis","exodo","levitico","numeros","deuteronomio",
+    "josue","jueces","rut",
+    "1_samuel","2_samuel","1_reyes","2_reyes",
+    "1_cronicas","2_cronicas","esdras","nehemias","ester",
+    "job","salmos","proverbios","eclesiastes","cantares",
+    "isaias","jeremias","lamentaciones","ezequiel","daniel",
+    "oseas","joel","amos","abdias","jonas","miqueas",
+    "nahum","habacuc","sofonias","hageo","zacarias","malaquias",
+    "mateo","marcos","lucas","juan","hechos","romanos",
+    "1_corintios","2_corintios","galatas","efesios",
+    "filipenses","colosenses",
+    "1_tesalonicenses","2_tesalonicenses",
+    "1_timoteo","2_timoteo","tito","filemon","hebreos",
+    "santiago","1_pedro","2_pedro","1_juan","2_juan","3_juan",
+    "judas","apocalipsis"
+];
+
+const NOMBRE_LIBRO = {
+    genesis:"Génesis", exodo:"Éxodo", levitico:"Levítico",
+    numeros:"Números", deuteronomio:"Deuteronomio",
+    josue:"Josué", jueces:"Jueces", rut:"Rut",
+    "1_samuel":"1 Samuel", "2_samuel":"2 Samuel",
+    "1_reyes":"1 Reyes", "2_reyes":"2 Reyes",
+    "1_cronicas":"1 Crónicas", "2_cronicas":"2 Crónicas",
+    esdras:"Esdras", nehemias:"Nehemías", ester:"Ester",
+    job:"Job", salmos:"Salmos", proverbios:"Proverbios",
+    eclesiastes:"Eclesiastés", cantares:"Cantares",
+    isaias:"Isaías", jeremias:"Jeremías",
+    lamentaciones:"Lamentaciones", ezequiel:"Ezequiel",
+    daniel:"Daniel", oseas:"Oseas", joel:"Joel",
+    amos:"Amós", abdias:"Abdías", jonas:"Jonás",
+    miqueas:"Miqueas", nahum:"Nahúm", habacuc:"Habacuc",
+    sofonias:"Sofonías", hageo:"Hageo", zacarias:"Zacarías",
+    malaquias:"Malaquías", mateo:"Mateo", marcos:"Marcos",
+    lucas:"Lucas", juan:"Juan", hechos:"Hechos",
+    romanos:"Romanos", "1_corintios":"1 Corintios",
+    "2_corintios":"2 Corintios", galatas:"Gálatas",
+    efesios:"Efesios", filipenses:"Filipenses",
+    colosenses:"Colosenses",
+    "1_tesalonicenses":"1 Tesalonicenses",
+    "2_tesalonicenses":"2 Tesalonicenses",
+    "1_timoteo":"1 Timoteo", "2_timoteo":"2 Timoteo",
+    tito:"Tito", filemon:"Filemón", hebreos:"Hebreos",
+    santiago:"Santiago", "1_pedro":"1 Pedro", "2_pedro":"2 Pedro",
+    "1_juan":"1 Juan", "2_juan":"2 Juan", "3_juan":"3 Juan",
+    judas:"Judas", apocalipsis:"Apocalipsis"
+};
+
+function nombreLibro(key){
+    return NOMBRE_LIBRO[key] || key;
+}
+
+function totalCapitulos(key){
+    return BIBLIA[key]
+        ? Object.keys(BIBLIA[key]).length
+        : 0;
+}
+
+function navegarSiguiente(){
+    if(!libroActual || !capActual) return;
+    let numCap = parseInt(capActual);
+    let total = totalCapitulos(libroActual);
+    if(numCap < total){
+        let siguiente = String(numCap + 1);
+        if(BIBLIA[libroActual][siguiente]){
+            cargarCapituloDirecto(libroActual, siguiente);
+        }
+    } else {
+        let idx = ORDEN_LIBROS.indexOf(libroActual);
+        if(idx >= 0 && idx < ORDEN_LIBROS.length - 1){
+            let siguienteLibro = ORDEN_LIBROS[idx + 1];
+            if(BIBLIA[siguienteLibro]){
+                let primera = Object.keys(
+                    BIBLIA[siguienteLibro]
+                )[0];
+                if(primera){
+                    cargarCapituloDirecto(
+                        siguienteLibro, primera
+                    );
+                }
+            }
+        }
+    }
+}
+
+function navegarAnterior(){
+    if(!libroActual || !capActual) return;
+    let numCap = parseInt(capActual);
+    if(numCap > 1){
+        let anterior = String(numCap - 1);
+        if(BIBLIA[libroActual][anterior]){
+            cargarCapituloDirecto(libroActual, anterior);
+        }
+    } else {
+        let idx = ORDEN_LIBROS.indexOf(libroActual);
+        if(idx > 0){
+            let libroAnterior = ORDEN_LIBROS[idx - 1];
+            if(BIBLIA[libroAnterior]){
+                let caps = Object.keys(
+                    BIBLIA[libroAnterior]
+                );
+                let ultimo = caps[caps.length - 1];
+                if(ultimo){
+                    cargarCapituloDirecto(
+                        libroAnterior, ultimo
+                    );
+                }
+            }
+        }
+    }
+}
+
+function cargarCapituloDirecto(libro, capitulo){
+    if(!BIBLIA[libro] || !BIBLIA[libro][capitulo]) return;
+    libroActual = libro;
+    capActual = capitulo;
+    versiculos = Object.entries(BIBLIA[libro][capitulo]);
+    indice = 0;
+    document.getElementById("busquedaBiblia").value =
+        nombreLibro(libro) + " " + capitulo;
+    renderPredicador();
+}
+
+function versiculoSiguiente(){
+    if(indice < versiculos.length - 1){
+        indice++;
+        actualizarActivo();
+    } else {
+        navegarSiguiente();
+    }
+}
+
+function versiculoAnterior(){
+    if(indice > 0){
+        indice--;
+        actualizarActivo();
+    } else {
+        navegarAnterior();
+    }
+}
+
 /* ================= NAVEGACION ================= */
 
 function ir(id){
@@ -874,7 +990,7 @@ function limpiar(txt){
     return txt
         .toLowerCase()
         .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[\u0300-\u036f]/g,"")
         .trim();
 
 }
@@ -1036,7 +1152,7 @@ function renderPredicador(){
             >
 
                 <div class="predica-ref">
-                    ${libroActual}
+                    ${nombreLibro(libroActual)}
                     ${capActual}:${v[0]}
                 </div>
 
@@ -1104,38 +1220,11 @@ function actualizarIndicador(){
     document.getElementById(
         "indicadorVersiculo"
     ).innerHTML = `
-        ${indice + 1}
+        ${nombreLibro(libroActual)}
+        ${capActual}:${indice + 1}
         /
         ${versiculos.length}
     `;
-
-}
-
-/* ================= SIGUIENTE ================= */
-
-function versiculoSiguiente(){
-
-    if(indice < versiculos.length - 1){
-
-        indice++;
-
-        actualizarActivo();
-
-    }
-
-}
-
-/* ================= ANTERIOR ================= */
-
-function versiculoAnterior(){
-
-    if(indice > 0){
-
-        indice--;
-
-        actualizarActivo();
-
-    }
 
 }
 
@@ -1187,6 +1276,36 @@ function salirPredicador(){
 
 }
 
+/* ================= CONTROL ================= */
+
+function controlAnterior(){
+
+    if(modoHimno){
+
+        anteriorHimno();
+
+    }else{
+
+        versiculoAnterior();
+
+    }
+
+}
+
+function controlSiguiente(){
+
+    if(modoHimno){
+
+        siguienteHimno();
+
+    }else{
+
+        versiculoSiguiente();
+
+    }
+
+}
+
 /* ================= TECLADO ================= */
 
 document.addEventListener("keydown", e => {
@@ -1216,7 +1335,7 @@ document.addEventListener("keydown", e => {
 
             e.preventDefault();
 
-            versiculoAnterior();
+            controlAnterior();
 
         }
 
@@ -1364,7 +1483,7 @@ function mostrarResultadosBusqueda(resultados){
             <div class="resultado-busqueda">
 
                 <b>
-                    ${r.libro}
+                    ${nombreLibro(r.libro)}
                     ${r.capitulo}:${r.versiculo}
                 </b>
 
